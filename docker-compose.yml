@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  front:
+    image: front
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    volumes:
+      - ./front:/usr/src/app
+    ports:
+      - 3000:3000
+    container_name: front
+  back:
+    image: express-server
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    volumes:
+      - ./back/:/usr/src/app
+    ports:
+      - 3001:3001
+  nginx:
+    image: nginx:1.20.1
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 8080:80
+    container_name: reverse-proxy
+    depends_on:
+      - front
+      - back

@@ -1,6 +1,8 @@
 import React, { FormEvent, useState } from 'react';
 import { Configuration, OpenAIApi } from "openai";
 import './App.css';
+import axios from 'axios'
+
 
 function App() {
  
@@ -11,26 +13,69 @@ function App() {
   
     // TODO move to backend
   const conf = new Configuration({
-    apiKey: 'dsafdafs'
+    apiKey: process.env.REACT_APP_API_KEY
   })
   const openai = new OpenAIApi(conf)
 
+  // async function onSubmit(event: any) {
+  //   event.preventDefault();
+  //   const adjectives = event.target['adjectives'].value
+  //   const topic = event.target['topic'].value
+  //   const prompt = `Create a ${adjectives} aphorism on the topic of ${topic}`;
+  //   console.log('prompt', prompt)
+
+  //   const response = await openai.createCompletion({
+  //     model: "text-davinci-003",
+  //     prompt,
+  //     max_tokens: 256
+  //   })
+  //   console.log(response)
+
+  //   if (!response.data.choices[0].text) {
+  //     console.log('fail')
+  //     return;
+  //   }
+  //   const aphorism = response.data.choices[0].text;
+
+  //   setResponse(aphorism);
+
+  //   const imageDescriptionPrompt = `Create a description of a background image fitting the mood of the aphorism ${aphorism}`
+
+  //   const descResponse = await openai.createCompletion({
+  //     model: "text-davinci-003",
+  //     prompt: imageDescriptionPrompt,
+  //     max_tokens: 256
+  //   })
+
+  //   console.log(descResponse)
+    
+
+  //   if (!descResponse.data.choices[0].text) {
+  //     console.log('fail')
+  //     return;
+  //   }
+  //   const imagePrompt = descResponse.data.choices[0].text
+
+  //   const imageResponse = await openai.createImage({
+  //     prompt: imagePrompt,
+  //     size: '512x512',
+
+  //   })
+  //   console.log(imageResponse)
+  //   if (imageResponse.data.data[0].url) {
+  //     setImageUrl(imageResponse.data.data[0].url ?? '')
+  //   } else {
+  //     console.log('fail')
+  //   }
+  // }
   async function onSubmit(event: any) {
     event.preventDefault();
-    const input = event.target['text'].value
-    console.log('input', input)
+    const adjectives = event.target['adjectives'].value
+    const topic = event.target['topic'].value
 
-    const response = await openai.createCompletion({
-      model: "text-davinci-002",
-      prompt: "Hello world",
-    })
-    console.log(response)
-
-    if (response.data.choices[0].text) {
-      setResponse(response.data.choices[0].text)
-    } else {
-      console.log('fail')
-    }    
+    const result = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/aphorism`)
+    setResponse(result.data.text)
+    setImageUrl(result.data.url)
   }
 
   async function onSubmitImage(event: any) {
@@ -65,34 +110,29 @@ function App() {
           ctx.drawImage(image, 0, 0);
           ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
           ctx.fillRect(12, 256, 488, 248)
-          const text = " öri öri öri\n sed do eiusmod tempor incididunt ut labore et dolore \n magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation \n ullamco laboris nisi ut aliquip ex ea commodo consequat."
-          var lines = text.split('\n');
+          
+          var lines = splitText(response);
           ctx.fillStyle = 'black'
           ctx.font = "48px serif";
-          ctx.fillText(lines[0], 18, 280, 474)
-          ctx.fillText(lines[1], 18, 310, 474)
-          ctx.fillText(lines[2], 18, 340, 474)
-          ctx.fillText(lines[3], 18, 370, 474)
+          lines.forEach((line, index) => {
+            ctx.fillText(line, 18, 300 + (index * 40), 474)
+          })
           console.log('onload done')
 
       };
-      image.src = 'sfdasadf'}
+      image.src = imageUrl
+      // image.src = 'test.png'
+    }
   }
-
-
-  
-
   return (
     <div>
 
       <h1>AforismFi</h1>
       <form onSubmit={onSubmit}>
-        <input type ='text' id='text'></input>
-        <button>Submit</button>
-      </form>
-      <p>image</p>
-      <form onSubmit={onSubmitImage}>
-        <input type ='text' id='text'></input>
+        <label>Create a</label>
+        <input type ='text' id='adjectives'></input>
+        <label>aphorism on the topic of</label>
+        <input type ='text' id='topic'></input>
         <button>Submit</button>
       </form>
       <p>Response: {response}</p>
@@ -103,3 +143,19 @@ function App() {
 }
 
 export default App;
+
+
+function splitText(text: string): string[] {
+  const lineLength = 50;
+
+  const lines: string[] = []
+  
+  let start = 0;
+  while (start < text.length) {
+    let end = Math.min(start+lineLength, text.length)
+    lines.push(text.substring(start, end))
+    start += lineLength;
+  }
+
+  return lines;
+}
