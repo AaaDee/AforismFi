@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Configuration, OpenAIApi } from 'openai';
+// import { Configuration, OpenAIApi } from 'openai';
 import './App.css';
 import axios from 'axios';
 
@@ -12,10 +12,10 @@ function App() {
 
   
   // TODO move to backend
-  const conf = new Configuration({
-    apiKey: process.env.REACT_APP_API_KEY
-  });
-  const openai = new OpenAIApi(conf);
+  // const conf = new Configuration({
+  //   apiKey: process.env.REACT_APP_API_KEY
+  // });
+  // const openai = new OpenAIApi(conf);
 
   // async function onSubmit(event: any) {
   //   event.preventDefault();
@@ -68,33 +68,14 @@ function App() {
   //     console.log('fail');
   //   }
   // }
-  async function onSubmit(event: any) {
+  async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    const adjectives = event.target!['adjectives'].value;
-    const topic = event.target['topic'].value;
+    // const adjectives = event.target['adjectives'].value;
+    // const topic = event.target['topic'].value;
 
     const result = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/aphorism`);
     setResponse(result.data.text);
     setImageUrl(result.data.url);
-  }
-
-  async function onSubmitImage(event: any) {
-    event.preventDefault();
-    const input = event.target['text'].value;
-    console.log('input', input);
-
-    const response = await openai.createImage({
-      prompt: input,
-      size: '512x512',
-
-    });
-    console.log(response);
-
-    if (response.data.data[0].url) {
-      setImageUrl(response.data.data[0].url ?? '');
-    } else {
-      console.log('fail');
-    }
   }
 
   function loadCanvas() {
