@@ -21,10 +21,14 @@ jobs:
         run: |
           npm install "./back"
           npm install "./front"  
-      - name: lint
+      - name: lint front
         run: |
-          npm run lint "./back"
-          npm run lint "./front" 
+          npm run lint
+        working-directory: ./front
+      - name: lint back
+        run: |
+          npm run lint
+        working-directory: ./back
       # - name: build
       #   run: npm run build
       # - name: test frontend
