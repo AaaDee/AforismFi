@@ -16,9 +16,14 @@ function App() {
     const adjectives = target.adjectives.value;
     const topic = target.topic.value;
 
-    const result = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/aphorism`, {
-      params: { adjectives, topic}
-    });
+    // const result = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/aphorism`, {
+    //   params: { adjectives, topic}
+    // });
+
+    const result = {data: {
+      text: 'Reissu on aina reissu',
+      url: '/test.png'
+    }};
     setResponse(result.data.text);
     setImageUrl(result.data.url);
   }

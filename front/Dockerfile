@@ -24,9 +24,8 @@ RUN npm run build
 
 # serve
 
-FROM nginx:1.20-alpine
+RUN npm install -g serve
 
-COPY --from=build-stage /usr/src/app/build /usr/share/nginx/html
+EXPOSE 3000
 
-# docker build -t todo-front .
-# docker run -p3001:80 todo-front
+CMD ["serve", "-s", "-l", "3000", "build"]
